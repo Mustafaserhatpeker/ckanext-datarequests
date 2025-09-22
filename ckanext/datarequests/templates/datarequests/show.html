@@ -20,10 +20,10 @@
 
             <div class="panel panel-default" style="padding:15px; margin-top:15px;">
                 <h3 style="margin-top:0; font-size:18px;">Açıklama</h3>
-                <div style="white-space: pre-line; color:#333;">
+                <div style="white-space: pre-line; ">
                     {{ dr.description }}
                 </div>
-                <p style="margin-top:12px; font-size:12px; color:#666;">
+                <p style="margin-top:12px; font-size:12px; color:#fff;">
                     Oluşturan (kullanıcı id):
                     {% if dr.user_id %}
                     <code style="font-size:11px;">{{ dr.user_id }}</code>
@@ -61,14 +61,14 @@
                 <ul class="list-unstyled" style="margin-top:15px;">
                     {% for c in comments %}
                     <li class="panel panel-default" style="padding:10px 12px; margin-bottom:10px;">
-                        <div style="color:#444; font-size:12px; margin-bottom:4px;">
+                        <div style="font-size:12px; margin-bottom:4px;">
                             {% if c.author %}
                             <strong>
                                 <a href="{{ h.url_for('user.read', id=c.author.name) }}">
                                     {{ c.author.display_name or c.author.name }}
                                 </a>
                             </strong>
-                            <span style="color:#777;">(@{{ c.author.name }})</span>
+                            <span style="color:#ffffff;">(@{{ c.author.name }})</span>
                             {% else %}
                             <strong>Bilinmeyen Kullanıcı</strong>
                             {% endif %}
@@ -76,7 +76,7 @@
                             <span> • {{ h.render_datetime(c.created_at, with_hours=True) }}</span>
                             {% endif %}
                         </div>
-                        <div style="white-space: pre-line; color:#222;">
+                        <div style="white-space: pre-line; ">
                             {{ c.content }}
                         </div>
                     </li>
