@@ -1,0 +1,112 @@
+{% extends "page.html" %}
+
+{% block subtitle %}Veri İsteği{% endblock %}
+
+{% block content %}
+<div class="dr-show">
+
+    <div class="row">
+        <div class="col-md-10">
+            <h1 class="page-heading" style="margin-top:0;">
+                {{ dr.title }}
+                <span class="label {{ 'label-success' if dr.status == 'open' else 'label-default' }}"
+                    style="margin-left:8px;">
+                    {{ dr.status|upper }}
+                </span>
+            </h1>
+            <p class="text-muted" style="margin-top:4px; font-size:13px;">
+                Toplam yorum: {{ dr.comment_count }}
+            </p>
+
+            <div class="panel panel-default" style="padding:15px; margin-top:15px;">
+                <h3 style="margin-top:0; font-size:18px;">Açıklama</h3>
+                <div style="white-space: pre-line; color:#333;">
+                    {{ dr.description }}
+                </div>
+                <p style="margin-top:12px; font-size:12px; color:#666;">
+                    Oluşturan (kullanıcı id):
+                    {% if dr.user_id %}
+                    <code style="font-size:11px;">{{ dr.user_id }}</code>
+                    {% else %}
+                    <em>Bilinmiyor</em>
+                    {% endif %}
+                    {# İyileştirme notu:
+                    creator.display_name göstermek için:
+                    - Model mapper'da 'creator' ilişkisinin zaten tanımlı olduğundan emin olun (var).
+                    - plugin.py show route içinde ORM objesinden creator'ı alıp extra_vars'a creator_display_name olarak
+                    ekleyin.
+                    - Sonra burada dr.user_id yerine o alanı gösterin. #}
+                </p>
+            </div>
+
+            {% if is_sysadmin %}
+            <div class="panel panel-warning" style="padding:15px; margin-top:15px;">
+                <h3 style="margin-top:0; font-size:18px;">Durum Değiştir</h3>
+                <form method="post" action="{{ h.url_for('datarequests.change_status', id=dr.id) }}">
+                    {{ h.csrf_input() }}
+                    <div class="form-group" style="max-width:260px;">
+                        <select class="form-control" name="status">
+                            <option value="open" {% if dr.status=='open' %}selected{% endif %}>Açık</option>
+                            <option value="closed" {% if dr.status=='closed' %}selected{% endif %}>Kapalı</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-warning">Güncelle</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <div style="margin-top:30px;">
+                <h3 style="margin-top:0;">Yorumlar</h3>
+                {% if comments and comments|length > 0 %}
+                <ul class="list-unstyled" style="margin-top:15px;">
+                    {% for c in comments %}
+                    <li class="panel panel-default" style="padding:10px 12px; margin-bottom:10px;">
+                        <div style="color:#444; font-size:12px; margin-bottom:4px;">
+                            {% if c.author %}
+                            <strong>
+                                <a href="{{ h.url_for('user.read', id=c.author.name) }}">
+                                    {{ c.author.display_name or c.author.name }}
+                                </a>
+                            </strong>
+                            <span style="color:#777;">(@{{ c.author.name }})</span>
+                            {% else %}
+                            <strong>Bilinmeyen Kullanıcı</strong>
+                            {% endif %}
+                            {% if c.created_at %}
+                            <span> • {{ h.render_datetime(c.created_at, with_hours=True) }}</span>
+                            {% endif %}
+                        </div>
+                        <div style="white-space: pre-line; color:#222;">
+                            {{ c.content }}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">Henüz yorum yok.</p>
+                {% endif %}
+            </div>
+
+            {% if is_authenticated %}
+            <div id="add-comment" class="panel panel-default" style="padding:15px; margin-top:25px;">
+                <h3 style="margin-top:0; font-size:18px;">Yorum Ekle</h3>
+                <form method="post" action="{{ h.url_for('datarequests.add_comment', id=dr.id) }}">
+                    {{ h.csrf_input() }}
+                    <div class="form-group">
+                        <textarea name="content" class="form-control" rows="4"
+                            placeholder="Bu veri isteği hakkında görüş veya önerinizi yazın..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gönder</button>
+                </form>
+            </div>
+            {% else %}
+            <p style="margin-top:20px; font-size:13px;">
+                <a href="{{ h.url_for('user.login', came_from=h.url_for('datarequests.show', id=dr.id)) }}">
+                    Giriş yaparak yorum ekleyebilirsiniz
+                </a>.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

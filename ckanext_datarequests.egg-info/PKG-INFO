@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: ckanext-datarequests
+Version: 0.1.1
+Summary: CKAN extension to manage data requests (veri istekleri).
+Author: Your Name
+License: AGPL
+Requires-Dist: ckan>=2.9
+Dynamic: author
+Dynamic: description
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: summary
+
+A CKAN extension that allows users to create and discuss data requests. Anonymous users can view, authenticated users can create requests and comments, only sysadmins can change request status.

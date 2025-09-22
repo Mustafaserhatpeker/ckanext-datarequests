@@ -1,0 +1,106 @@
+{% extends "page.html" %}
+
+{% block subtitle %}Veri İstekleri{% endblock %}
+
+{% block content %}
+<div class="dr-index">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-heading">Veri İstekleri</h1>
+            <div class="toolbar" style="margin-bottom:20px;">
+                {% if is_authenticated %}
+                <a class="btn btn-primary" href="{{ h.url_for('datarequests.new') }}">Yeni Veri İsteği</a>
+                {% else %}
+                <a class="btn btn-primary" href="{{ h.url_for('user.login', came_from=h.url_for('datarequests.new')) }}"
+                    title="Veri isteği oluşturmak için lütfen giriş yapın.">
+                    Yeni Veri İsteği
+                </a>
+                <p class="help-block" style="margin-top:6px;">
+                    Veri isteği oluşturmak için lütfen giriş yapın; girişten sonra istek oluşturma sayfasına
+                    yönlendirileceksiniz.
+                </p>
+                {% endif %}
+            </div>
+
+            {% if datarequests %}
+            <ul class="list-unstyled datareq-list">
+                {% for dr in datarequests %}
+                <li class="panel panel-default" style="padding:15px; margin-bottom:18px;">
+                    <div class="clearfix">
+                        <h3 style="margin-top:0; float:left;">
+                            <a href="{{ h.url_for('datarequests.show', id=dr.id) }}">{{ dr.title }}</a>
+                        </h3>
+                        <div class="pull-right" style="margin-top:5px;">
+                            <span class="label {{ 'label-success' if dr.status == 'open' else 'label-default' }}">
+                                {{ dr.status|upper }}
+                            </span>
+                            <span class="text-muted" style="margin-left:10px;">
+                                {{ dr.comment_count }} yorum
+                            </span>
+                        </div>
+                    </div>
+
+                    <p style=" white-space: pre-line; margin-top:8px;">
+                        {{ dr.description[:260] }}{% if dr.description|length > 260 %}...{% endif %}
+                        <a href="{{ h.url_for('datarequests.show', id=dr.id) }}" style="margin-left:4px;">Detay</a>
+                    </p>
+
+                    <div class="dr-comments-block" style="margin-top:15px;">
+                        <h4 style="margin-top:0; font-size:15px; font-weight:600;">Yorumlar</h4>
+                        {% if dr.comments and dr.comments|length > 0 %}
+                        <ul class="list-unstyled" style="margin-bottom:12px;">
+                            {% for c in dr.comments %}
+                            <li
+                                style="padding:8px 10px; border:1px solid #e5e5e5; border-radius:4px; margin-bottom:6px; background:#fafafa;">
+                                <div style="font-size:12px; color:#777; margin-bottom:4px;">
+                                    {% set author_name = c.user_display_name or c.user_name or 'Bilinmeyen Kullanıcı' %}
+                                    <strong>{{ author_name }}</strong>
+                                    {% if c.created_at %}
+                                    • {{ h.render_datetime(c.created_at, with_hours=True) }}
+                                    {% endif %}
+                                </div>
+                                <div style="white-space: pre-line;">
+                                    {{ c.content }}
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="text-muted" style="margin:0 0 10px;">Henüz yorum yok.</p>
+                        {% endif %}
+
+                        {% if is_authenticated %}
+                        <form method="post" action="{{ h.url_for('datarequests.add_comment', id=dr.id) }}"
+                            style="margin-top:10px;">
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <label for="comment-{{ dr.id }}" style="font-weight:600; font-size:12px; ">
+                                    Yorum Ekle
+                                </label>
+                                <textarea id="comment-{{ dr.id }}" name="content" class="form-control" rows="2"
+                                    placeholder="Bu veri isteği hakkında görüşünüz..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-xs btn-primary">
+                                Gönder
+                            </button>
+                            <a href="{{ h.url_for('datarequests.show', id=dr.id) }}" class="btn btn-xs btn-default">
+                                Detay Sayfasına Git
+                            </a>
+                        </form>
+                        {% else %}
+                        <p style="font-size:12px; margin-top:6px;">
+                            <a href="{{ h.url_for('user.login', came_from=h.url_for('datarequests.show', id=dr.id)) }}">
+                                Yorum eklemek için giriş yapın
+                            </a>
+                        </p>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>Henüz bir veri isteği bulunamadı.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

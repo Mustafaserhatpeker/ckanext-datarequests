@@ -1,0 +1,2 @@
+[ckan.plugins]
+datarequests = ckanext.datarequests.plugin:DataRequestsPlugin
